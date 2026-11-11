@@ -272,6 +272,13 @@
 
   .save-html-btn { text-decoration: none; }
   header.page .meta .updated { display: block; font-size: 11.5px; margin-top: 2px; }
+  body { overflow-x: hidden; }
+  header.page > * { min-width: 0; }
+  @media (max-width: 640px) {
+    header.page { align-items: flex-start; }
+    .header-right { flex-wrap: wrap; gap: 8px 10px; width: 100%; }
+    header.page .meta { flex: 1 1 100%; }
+  }
   .load-state { margin: 8px 0 14px; padding: 12px 14px; border-radius: 8px; font-size: 13px;
     background: var(--accent-soft); color: var(--accent-ink); border: 1px solid var(--line); }
   .load-state.error { background: var(--surface); color: #b3261e; border-color: #e6b8b3; }
