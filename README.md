@@ -2,8 +2,8 @@
 
 社内共有の検索できる価格表。
 
-- 見る：https://xtshu5000-a11y.github.io/option/
-- 更新：https://xtshu5000-a11y.github.io/option/admin.html
+- 見る：https://inouegroup.github.io/option/
+- 更新：https://inouegroup.github.io/option/admin.html
 
 画面（index.html）は開くたびに Firebase（Firestore）から最新データを読み込みます。
 データを変えるときに HTML の作り直しは不要です。
