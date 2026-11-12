@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ja"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>三菱エアコン価格表</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap">
+<style>
+/* layout: 上に「施工費のしくみ」帯、下にシリーズ別の価格表。表は本体＋工事込みの合計を主役にする */
+:root{
+  --bg:#f5f7f8; --panel:#ffffff; --fg:#17232b; --muted:#5b6b75; --line:#d9e1e5;
+  --accent:#0b6e8f; --accent-soft:#e2f1f6; --warm:#b4541c; --warm-soft:#fbeee5;
+  --display:"Zen Kaku Gothic New","BIZ UDPGothic","Hiragino Sans","Yu Gothic",sans-serif;
+  --body:"BIZ UDPGothic","Hiragino Sans","Yu Gothic","Meiryo",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f171c; --panel:#16222a; --fg:#e6eef2; --muted:#9aaab4; --line:#2a3a44;
+  --accent:#5cc3e4; --accent-soft:#163542; --warm:#f0a070; --warm-soft:#3a2518; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f171c; --panel:#16222a; --fg:#e6eef2; --muted:#9aaab4; --line:#2a3a44;
+  --accent:#5cc3e4; --accent-soft:#163542; --warm:#f0a070; --warm-soft:#3a2518; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:14px;line-height:1.6}
+.wrap{max-width:1180px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:22px}
+header h1{font-family:var(--display);font-weight:900;font-size:clamp(22px,3.2vw,30px);margin:0;text-wrap:balance;letter-spacing:.02em}
+header p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.tag{display:inline-block;font-size:11px;letter-spacing:.08em;padding:2px 8px;border-radius:3px;background:var(--accent-soft);color:var(--accent);font-weight:700}
+.howto{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:18px;display:grid;gap:14px}
+.howto h2,.sec h2{font-family:var(--display);font-size:17px;margin:0}
+.formula{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:15px}
+.formula .b{background:var(--accent-soft);color:var(--accent);padding:6px 10px;border-radius:6px;font-weight:700}
+.formula .w{background:var(--warm-soft);color:var(--warm);padding:6px 10px;border-radius:6px;font-weight:700}
+.formula .t{border:2px solid var(--fg);padding:5px 10px;border-radius:6px;font-weight:700}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.inst{border:1px solid var(--line);border-radius:6px;padding:10px 12px;display:grid;gap:2px}
+.inst .k{font-size:12px;color:var(--muted)}
+.inst .v{font-size:20px;font-weight:700;color:var(--warm);font-variant-numeric:tabular-nums}
+.note{font-size:12.5px;color:var(--muted);margin:0}
+.note li{margin:2px 0}
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.tools input,.tools select{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--fg)}
+.tools input{flex:1 1 220px;min-width:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--panel);color:var(--fg);padding:5px 11px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:700}
+.chip:focus-visible,.tools input:focus-visible,.tools select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.sec{display:grid;gap:8px}
+.shead{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+.shead .code{font-family:var(--display);font-weight:900;font-size:22px;color:var(--accent)}
+.shead .cls{font-weight:700}
+.shead .feat{color:var(--muted);font-size:12.5px;flex-basis:100%}
+.scroll{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;min-width:900px;font-variant-numeric:tabular-nums}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th{font-size:12px;color:var(--muted);font-weight:700;background:var(--bg);position:sticky;top:0}
+th.l,td.l{text-align:left}
+tr:last-child td{border-bottom:none}
+td.m{font-weight:700;font-family:var(--body)}
+td.body{color:var(--accent);font-weight:700}
+td.tot{font-weight:700;font-size:15px}
+th.tot{color:var(--fg)}
+td.add,th.add{color:var(--warm)}
+td.add{background:var(--warm-soft)}
+.pw{font-size:11px;padding:1px 6px;border-radius:3px;border:1px solid var(--line);color:var(--muted)}
+.pw.v2{border-color:var(--warm);color:var(--warm)}
+.opt table{min-width:420px}
+.empty{padding:24px;text-align:center;color:var(--muted)}
+footer{font-size:12px;color:var(--muted)}
+a.doc{display:inline-block;margin-top:4px;padding:8px 14px;border:1px solid var(--accent);border-radius:6px;color:var(--accent);font-weight:700;text-decoration:none;background:var(--accent-soft)}
+a.doc:hover{text-decoration:underline}
+a.slink{font-size:12.5px;font-weight:700;color:var(--accent)}
+a.slink:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+a.doc:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.upd{font-size:12px!important}
+.load-state{margin-top:8px;padding:10px 12px;border-radius:6px;font-size:13px;background:var(--accent-soft);color:var(--accent)}
+.load-state.error{background:var(--warm-soft);color:var(--warm)}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+<header>
+  <span class="tag">社内用・営業／設計向け</span>
+  <h1><span id="tTitle">三菱エアコン価格表</span> <span id="tStart" style="white-space:nowrap"></span></h1>
+  <p id="tNote1"></p>
+  <p id="tNote2"></p>
+  <p id="tPdfWrap" hidden><a class="doc" id="tPdf" href="商品プレゼン.pdf" target="_blank" rel="noopener">商品プレゼンを開く（PDF）</a></p>
+  <p class="upd" id="tUpd"></p>
+  <div class="load-state" id="loadState">データを読み込んでいます…</div>
+</header>
+
+<section class="sec" aria-labelledby="h-list">
+  <h2 id="h-list">本体＋工事の価格</h2>
+  <div class="tools">
+    <input id="q" type="search" placeholder="型番・畳数で検索（例：14畳、ZXV40）" aria-label="型番・畳数で検索">
+    <select id="tatami" aria-label="畳数で絞り込み"><option value="">畳数：すべて</option></select>
+  </div>
+  <div class="chips" id="chips" role="group" aria-label="シリーズで絞り込み"></div>
+  <div id="list" style="display:grid;gap:22px"></div>
+</section>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyA1m5FJR7TpQ6j74AKzw6JvMgGG3jAtB8k",
+  authDomain: "option-807c5.firebaseapp.com",
+  projectId: "option-807c5",
+  storageBucket: "option-807c5.firebasestorage.app",
+  messagingSenderId: "466998377835",
+  appId: "1:466998377835:web:4c798d0664e078b603202e"
+});
+const fdb=firebase.firestore();
+const CACHE_KEY='airconPriceCache_v1';
+let D={series:[],add:{roof:0,wb:0,hide:0},settings:{}};
+const yen=v=>v==null||v===''?'—':'¥'+Number(v).toLocaleString('ja-JP');
+const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+let sel='ALL';
+const chips=document.getElementById('chips');
+const q=document.getElementById('q'),ts=document.getElementById('tatami');
+chips.addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;sel=b.dataset.c;chips.querySelectorAll('.chip').forEach(x=>x.setAttribute('aria-pressed',x===b));render();});
+q.addEventListener('input',render);ts.addEventListener('change',render);
+function fmtDate(ms){if(!ms)return'';const d=new Date(ms),p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}/${p(d.getMonth()+1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;}
+function setLoad(msg,err){const el=document.getElementById('loadState');if(!msg){el.hidden=true;return;}el.hidden=false;el.textContent=msg;el.classList.toggle('error',!!err);}
+function apply(data,updatedMs){
+  D=data; const st=D.settings||{};
+  document.getElementById('tTitle').textContent=st['タイトル']||'三菱エアコン価格表';
+  document.getElementById('tStart').textContent=st['運用開始']||'';
+  document.getElementById('tNote1').textContent=st['説明1']||'';
+  document.getElementById('tNote2').textContent=st['説明2']||'';
+  document.getElementById('tPdfWrap').hidden=!st['PDFボタン'];
+  document.getElementById('tPdf').textContent=st['PDFボタン']||'';
+  document.title=[st['タイトル'],st['運用開始']].filter(Boolean).join(' ')||'三菱エアコン価格表';
+  document.getElementById('tUpd').textContent=updatedMs?'データ更新 '+fmtDate(updatedMs):'';
+  const keepT=ts.value;
+  const tat=[...new Set(D.series.flatMap(s=>s.models.map(m=>m.tatami)))].filter(v=>v!=='').sort((a,b)=>a-b);
+  ts.innerHTML='<option value="">畳数：すべて</option>'+tat.map(t=>`<option value="${t}">${t}畳用</option>`).join('');
+  ts.value=tat.map(String).includes(keepT)?keepT:'';
+  if(sel!=='ALL'&&!D.series.some(s=>s.code===sel))sel='ALL';
+  chips.innerHTML=[['ALL','すべて'],...D.series.map(s=>[s.code,s.code+' '+s.cls])].map(([c,l])=>`<button class="chip" data-c="${esc(c)}" aria-pressed="${c===sel}">${esc(l)}</button>`).join('');
+  render();
+}
+function render(){
+  const s=q.value.trim().toUpperCase().replace(/[\s-]/g,''),t=ts.value;
+  const out=[];
+  for(const se of D.series){
+    if(sel!=='ALL'&&se.code!==sel)continue;
+    const ms=se.models.filter(m=>(!t||String(m.tatami)===t)&&(!s||(String(m.m).replace(/-/g,'')+m.tatami+'畳').toUpperCase().includes(s.replace(/畳用?/,'畳'))));
+    if(!ms.length)continue;
+    out.push(`<div class="sec"><div class="shead"><span class="code">${esc(se.code)}</span><span class="cls">${esc(se.cls)}</span>${se.page?`<a class="slink" href="商品プレゼン.pdf#page=${Number(se.page)}" target="_blank" rel="noopener">${esc(se.code)}の商品プレゼン（PDF）</a>`:''}<span class="feat">${esc(se.feat)}</span></div>
+    <div class="scroll"><table><thead><tr><th class="l">型番</th><th>畳数</th><th>能力</th><th>電源</th><th>本体価格</th><th class="tot">工事込み<br>同じ階</th><th class="tot">工事込み<br>2階→1階</th><th class="add">追加<br>屋根置き</th><th class="add">追加<br>2段置き（大）</th><th class="add">追加<br>隠蔽配管</th></tr></thead><tbody>
+    ${ms.map(m=>`<tr><td class="l m">${esc(m.m)}</td><td>${esc(m.tatami)}畳用</td><td>${esc(m.kw)}kW</td><td><span class="pw ${m.pw==='200V'?'v2':''}">${esc(m.pw)}</span></td><td class="body">${yen(m.body)}</td><td class="tot">${yen(m.same)}</td><td class="tot">${yen(m.down)}</td><td class="add">+${yen(D.add.roof)}</td><td class="add">+${yen(D.add.wb)}</td><td class="add">+${yen(D.add.hide)}</td></tr>`).join('')}
+    </tbody></table></div></div>`);
+  }
+  document.getElementById('list').innerHTML=out.join('')||(D.series.length?'<div class="empty">条件に合う機種がありません。検索語か畳数を変えてください。</div>':'');
+}
+(async function boot(){
+  let cached=null;
+  try{cached=JSON.parse(localStorage.getItem(CACHE_KEY)||'null');}catch(e){}
+  if(cached&&cached.data){apply(cached.data,cached.updatedMs);setLoad('最新データを確認しています…');}
+  try{
+    const snap=await fdb.doc('aircon/current').get();
+    if(!snap.exists){setLoad('まだデータが登録されていません。更新ページ（aircon-admin.html）からExcelを登録してください。',true);return;}
+    const v=snap.data(); const updatedMs=v.updatedAt?v.updatedAt.toMillis():0;
+    if(!cached||cached.version!==v.version)apply(JSON.parse(v.json),updatedMs);
+    try{localStorage.setItem(CACHE_KEY,JSON.stringify({version:v.version,updatedMs,data:JSON.parse(v.json)}));}catch(e){}
+    setLoad('');
+  }catch(e){console.error(e);setLoad(cached?'最新データを取得できませんでした（前回のデータを表示中）。再読み込みしてください。':'データを取得できませんでした。通信状況を確認して再読み込みしてください。',true);}
+})();
+</script>
+</body>
+</html>

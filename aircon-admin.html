@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ja"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>エアコン価格表 データ更新</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+  /* 単価表本体と同じトークン。1カラムの手順ページ */
+  :root {
+    --bg: #F4F5F1; --surface: #FFFFFF; --ink: #20281F; --ink-soft: #667061;
+    --line: #DCE0D6; --line-strong: #B9C0AF; --accent: #4A6741; --accent-soft: #E7EDE2;
+    --accent-ink: #2F4429; --stripe: #FAFBF8; --bad: #b3261e; --bad-soft: #FBEDEB;
+    --serif: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+    --mono: 'SFMono-Regular', Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #171B15; --surface: #1E231C; --ink: #E8ECE4; --ink-soft: #9AA592;
+      --line: #2E362A; --line-strong: #3D4738; --accent: #8FB380; --accent-soft: #263123;
+      --accent-ink: #C4DBB9; --stripe: #1B201A; --bad: #F2A99F; --bad-soft: #3A2420;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 32px max(16px, env(safe-area-inset-right, 0px)) 60px max(16px, env(safe-area-inset-left, 0px)); }
+  header.page { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    border-bottom: 2px solid var(--ink); padding-bottom: 14px; margin-bottom: 22px; }
+  h1 { font-family: var(--serif); font-size: 23px; font-weight: 600; margin: 0; }
+  header a { color: var(--ink-soft); font-size: 13px; }
+  .step { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; margin-bottom: 14px; }
+  .step h2 { font-size: 14px; margin: 0 0 10px; display: flex; gap: 10px; align-items: center; }
+  .step h2 .no { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--ink); color: var(--bg); font-size: 12px; }
+  .step.disabled { opacity: .5; pointer-events: none; }
+  p.hint { font-size: 12.5px; color: var(--ink-soft); margin: 6px 0 0; line-height: 1.7; }
+  button.btn { font: 700 13.5px var(--sans); padding: 10px 18px; border-radius: 6px; cursor: pointer;
+    border: 1.5px solid var(--accent); background: var(--accent); color: #fff; }
+  button.btn.sub { background: var(--surface); color: var(--ink-soft); border-color: var(--line-strong); }
+  button.btn:disabled { opacity: .5; cursor: default; }
+  button:focus-visible, input:focus-visible { outline: 3px solid var(--accent-soft); outline-offset: 2px; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .who { font-size: 13px; }
+  input[type=file] { font: 13px var(--sans); max-width: 100%; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin: 12px 0; }
+  .stat { border-top: 1px solid var(--line); padding-top: 8px; }
+  .stat .k { font-size: 11.5px; color: var(--ink-soft); }
+  .stat .v { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .changes { max-height: 320px; overflow: auto; border: 1px solid var(--line); border-radius: 8px; font-size: 12.5px; }
+  .changes div { padding: 7px 10px; border-bottom: 1px solid var(--line); line-height: 1.5; }
+  .changes div:nth-child(even) { background: var(--stripe); }
+  .tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 4px; margin-right: 6px; }
+  .tag.add { background: var(--accent-soft); color: var(--accent-ink); }
+  .tag.del { background: var(--bad-soft); color: var(--bad); }
+  .tag.chg { background: var(--stripe); color: var(--ink); border: 1px solid var(--line-strong); }
+  .msg { margin-top: 12px; padding: 11px 13px; border-radius: 8px; font-size: 13px; line-height: 1.6; }
+  .msg.ok { background: var(--accent-soft); color: var(--accent-ink); }
+  .msg.err { background: var(--bad-soft); color: var(--bad); }
+  .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="page">
+    <h1>エアコン価格表 データ更新</h1>
+    <a href="aircon.html">← 価格表に戻る</a>
+  </header>
+
+  <section class="step" id="step1">
+    <h2><span class="no">1</span>Googleでログイン</h2>
+    <div class="row">
+      <button class="btn" id="loginBtn" type="button">Googleでログイン</button>
+      <button class="btn sub" id="logoutBtn" type="button" hidden>ログアウト</button>
+      <span class="who" id="who"></span>
+    </div>
+    <p class="hint">更新できるのは、Firestoreのルールに登録したメールアドレスのアカウントだけです。</p>
+  </section>
+
+  <section class="step disabled" id="step2">
+    <h2><span class="no">2</span>Excelを選ぶ</h2>
+    <input type="file" id="fileInput" accept=".xlsx,.xlsm,.xls">
+    <p class="hint">「エアコン価格表.xlsx」の4つのシート（シリーズ／機種／追加工事／設定）を読み込みます。シート名と1行目の見出しは変えないでください。</p>
+    <div id="parseMsg"></div>
+  </section>
+
+  <section class="step disabled" id="step3">
+    <h2><span class="no">3</span>変更内容を確認して更新</h2>
+    <div class="stats">
+      <div class="stat"><div class="k">Excelの機種数</div><div class="v" id="sNew">-</div></div>
+      <div class="stat"><div class="k">いまの機種数</div><div class="v" id="sOld">-</div></div>
+      <div class="stat"><div class="k">追加</div><div class="v" id="sAdd">-</div></div>
+      <div class="stat"><div class="k">削除</div><div class="v" id="sDel">-</div></div>
+      <div class="stat"><div class="k">変更</div><div class="v" id="sChg">-</div></div>
+    </div>
+    <div class="changes" id="changes"></div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn" id="uploadBtn" type="button" disabled>この内容で更新する</button>
+    </div>
+    <div id="uploadMsg"></div>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyA1m5FJR7TpQ6j74AKzw6JvMgGG3jAtB8k",
+  authDomain: "option-807c5.firebaseapp.com",
+  projectId: "option-807c5",
+  storageBucket: "option-807c5.firebasestorage.app",
+  messagingSenderId: "466998377835",
+  appId: "1:466998377835:web:4c798d0664e078b603202e"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const fdb = firebase.firestore();
+
+let newData = null, oldData = null, fileName = '';
+const $ = id => document.getElementById(id);
+function esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function msg(el, text, kind) { $(el).innerHTML = text ? `<div class="msg ${kind}">${text}</div>` : ''; }
+
+$('loginBtn').addEventListener('click', async () => {
+  $('loginBtn').disabled = true;
+  try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); msg('parseMsg', '', ''); }
+  catch (e) { if (e.code !== 'auth/cancelled-popup-request' && e.code !== 'auth/popup-closed-by-user') msg('parseMsg', 'ログインできませんでした：' + esc(e.message), 'err'); }
+  $('loginBtn').disabled = false;
+});
+$('logoutBtn').addEventListener('click', () => auth.signOut());
+auth.onAuthStateChanged(async user => {
+  $('loginBtn').hidden = !!user; $('logoutBtn').hidden = !user;
+  $('who').textContent = user ? user.email + ' でログイン中' : '';
+  $('step2').classList.toggle('disabled', !user);
+  if (user) { try { const d = await fdb.doc('aircon/current').get(); oldData = d.exists ? JSON.parse(d.data().json) : null; } catch (e) { oldData = null; } }
+});
+
+// ---------- Excel 読み込み
+function sheetRows(wb, name, required) {
+  const ws = wb.Sheets[name];
+  if (!ws) throw new Error(`「${name}」シートが見つかりません。`);
+  const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null, raw: true });
+  const hdr = (aoa[0] || []).map(h => h === null ? '' : String(h).trim());
+  const miss = required.filter(k => !hdr.includes(k));
+  if (miss.length) throw new Error(`「${name}」シートの1行目に ${miss.join('・')} の見出しがありません。`);
+  return aoa.slice(1).map(r => { const o = {}; hdr.forEach((h, i) => { if (h) o[h] = r ? r[i] : null; }); return o; })
+            .filter(o => Object.values(o).some(v => v !== null && String(v).trim() !== ''));
+}
+const str = v => v === null || v === undefined ? '' : String(v).trim();
+function num(v, label, where) {
+  if (v === null || v === undefined || String(v).trim() === '') return '';
+  const n = Number(String(v).replace(/[,¥\s円]/g, ''));
+  if (!isFinite(n)) throw new Error(`${where} の「${label}」が数字ではありません（${esc(v)}）。`);
+  return Math.round(n);
+}
+function kwText(v) { if (v === null || v === undefined || v === '') return ''; const n = Number(v); return isFinite(n) ? n.toFixed(1) : String(v).trim(); }
+
+$('fileInput').addEventListener('change', async e => {
+  const f = e.target.files[0]; if (!f) return;
+  fileName = f.name; msg('parseMsg', '', '');
+  try {
+    const wb = XLSX.read(await f.arrayBuffer(), { type: 'array' });
+    const ser = sheetRows(wb, 'シリーズ', ['シリーズ','分類','特徴']);
+    const mod = sheetRows(wb, '機種', ['シリーズ','型番','畳数','電源','本体価格','工事込み（同じ階）','工事込み（2階→1階）']);
+    const add = sheetRows(wb, '追加工事', ['項目','金額']);
+    const set = sheetRows(wb, '設定', ['項目','内容']);
+    const series = ser.map(r => ({ code: str(r['シリーズ']), cls: str(r['分類']), feat: str(r['特徴']), rel: str(r['発売']),
+      page: r['商品プレゼンのページ'] ? Number(r['商品プレゼンのページ']) || '' : '', models: [] }));
+    const byCode = new Map(series.map(s => [s.code, s]));
+    mod.forEach((r, i) => {
+      const where = `機種シート ${i + 2}行目`;
+      const code = str(r['シリーズ']);
+      const se = byCode.get(code);
+      if (!se) throw new Error(`${where}：シリーズ「${esc(code)}」がシリーズシートにありません。`);
+      if (!str(r['型番'])) throw new Error(`${where}：型番が空です。`);
+      se.models.push({ m: str(r['型番']), kw: kwText(r['能力kW']), tatami: num(r['畳数'], '畳数', where), pw: str(r['電源']),
+        body: num(r['本体価格'], '本体価格', where), same: num(r['工事込み（同じ階）'], '工事込み（同じ階）', where), down: num(r['工事込み（2階→1階）'], '工事込み（2階→1階）', where) });
+    });
+    const addMap = { '屋根置き': 'roof', '2段置き（大）': 'wb', '隠蔽配管': 'hide' };
+    const addv = { roof: '', wb: '', hide: '' };
+    add.forEach((r, i) => { const k = addMap[str(r['項目'])]; if (k) addv[k] = num(r['金額'], '金額', `追加工事シート ${i + 2}行目`); });
+    const settings = {}; set.forEach(r => { if (str(r['項目'])) settings[str(r['項目'])] = str(r['内容']); });
+    newData = { series: series.filter(s => s.models.length), add: addv, settings };
+    const n = newData.series.reduce((a, s) => a + s.models.length, 0);
+    msg('parseMsg', `${newData.series.length} シリーズ・${n} 機種を読み込みました。`, 'ok');
+    showDiff();
+  } catch (err) {
+    newData = null; $('step3').classList.add('disabled');
+    msg('parseMsg', 'Excelを読み込めませんでした：' + err.message, 'err');
+  }
+});
+
+// ---------- 差分（型番で比較）
+const FIELDS = [['body','本体価格'],['same','工事込み（同じ階）'],['down','工事込み（2階→1階）'],['tatami','畳数'],['kw','能力kW'],['pw','電源']];
+function flat(d) { const m = new Map(); (d ? d.series : []).forEach(s => s.models.forEach(x => m.set(x.m, { ...x, code: s.code }))); return m; }
+function showDiff() {
+  const o = flat(oldData), n = flat(newData), items = [];
+  let add = 0, del = 0, chg = 0;
+  n.forEach((x, k) => {
+    const y = o.get(k);
+    if (!y) { add++; items.push(`<div><span class="tag add">追加</span>${esc(k)}（${esc(x.code)}）</div>`); return; }
+    const d = FIELDS.filter(([f]) => String(y[f] ?? '') !== String(x[f] ?? ''));
+    if (y.code !== x.code) d.push(['code','シリーズ']);
+    if (d.length) { chg++; items.push(`<div><span class="tag chg">変更</span>${esc(k)}<br>${d.map(([f, l]) => `${l}：<span class="mono">${esc(y[f]) || '空欄'} → ${esc(x[f]) || '空欄'}</span>`).join('　')}</div>`); }
+  });
+  o.forEach((y, k) => { if (!n.has(k)) { del++; items.push(`<div><span class="tag del">削除</span>${esc(k)}（${esc(y.code)}）</div>`); } });
+  if (oldData) {
+    [['roof','屋根置き'],['wb','2段置き（大）'],['hide','隠蔽配管']].forEach(([k, l]) => {
+      if (String(oldData.add[k]) !== String(newData.add[k])) { chg++; items.push(`<div><span class="tag chg">変更</span>追加工事 ${l}<br><span class="mono">${esc(oldData.add[k])} → ${esc(newData.add[k])}</span></div>`); }
+    });
+    Object.keys({ ...oldData.settings, ...newData.settings }).forEach(k => {
+      if ((oldData.settings[k] || '') !== (newData.settings[k] || '')) { chg++; items.push(`<div><span class="tag chg">変更</span>設定 ${esc(k)}<br>${esc(oldData.settings[k] || '空欄')} → ${esc(newData.settings[k] || '空欄')}</div>`); }
+    });
+    const os = oldData.series.map(s => [s.code, s.cls, s.feat, s.rel, s.page].join('|')).join('\n');
+    const ns = newData.series.map(s => [s.code, s.cls, s.feat, s.rel, s.page].join('|')).join('\n');
+    if (os !== ns) { chg++; items.push('<div><span class="tag chg">変更</span>シリーズシート（分類・特徴・発売・ページ・並び順のどれか）</div>'); }
+  }
+  $('sNew').textContent = n.size; $('sOld').textContent = o.size;
+  $('sAdd').textContent = add; $('sDel').textContent = del; $('sChg').textContent = chg;
+  $('changes').innerHTML = !oldData ? '<div>初回の登録です（いまのデータは空）。</div>' : (items.join('') || '<div>いまのデータと同じ内容です。</div>');
+  $('step3').classList.remove('disabled'); $('uploadBtn').disabled = false; msg('uploadMsg', '', '');
+}
+
+// ---------- アップロード
+$('uploadBtn').addEventListener('click', async () => {
+  if (!newData) return;
+  const btn = $('uploadBtn'); btn.disabled = true; btn.textContent = '更新中…';
+  try {
+    await fdb.doc('aircon/current').set({
+      json: JSON.stringify(newData), version: Date.now().toString(36), fileName,
+      updatedBy: auth.currentUser.email, updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    oldData = JSON.parse(JSON.stringify(newData));
+    msg('uploadMsg', '更新しました。価格表を開き直すと反映されています。 <a href="aircon.html">価格表を開く</a>', 'ok');
+  } catch (e) {
+    console.error(e);
+    const denied = e && (e.code === 'permission-denied' || /permission/i.test(e.message));
+    msg('uploadMsg', denied ? `このアカウント（${esc(auth.currentUser && auth.currentUser.email)}）には書き込み権限がありません。` : '更新できませんでした：' + esc(e.message), 'err');
+    btn.disabled = false;
+  }
+  btn.textContent = 'この内容で更新する';
+});
+</script>
+</body>
+</html>
